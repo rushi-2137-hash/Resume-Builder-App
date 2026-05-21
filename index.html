@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | ResumePro Builder</title>
+  <meta name="description" content="Sign in to ResumePro to build professional, ATS-friendly resumes with modern templates." />
+  <link rel="stylesheet" href="style.css?v=4.1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons for small UI elements -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase_config.js"></script>
+  <script src="auth_manager.js"></script>
+</head>
+<body class="dashboard-body">
+  <div class="login-page">
+    
+    <!-- Left Side: Professional Hero Section -->
+    <div class="login-hero-side">
+      <div class="hero-decoration"></div>
+      <div class="login-hero-content">
+        <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 32px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+          <!-- <span style="color: #FFD700;">&#9733;</span> The #1 AI-Powered Resume Builder-->
+        </div>
+        <h1 class="login-hero-title">Your Career,<br>Elevated with Style.</h1>
+        <p class="login-hero-subtitle">Design professional, ATS-ready resumes in minutes. Choose from 30+ premium templates crafted by industry experts.</p>
+        
+        <div class="hero-mockup-wrapper">
+           <img src="login_hero_illustration_1779243297251.png" alt="ResumePro Template Preview" class="hero-mockup-img">
+           <div class="login-value-lines">
+            <div class="login-value-copy">
+              <div><i data-lucide="check-circle-2"></i> Create professional resumes within minutes.</div>
+              <div><i data-lucide="link-2"></i> Download ATS-friendly PDFs with clickable profile, portfolio, project, and contact links.</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 50px; display: flex; gap: 30px; opacity: 0.7;">
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 24px; font-weight: 800;">1.2M+</span>
+            <span style="font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Trusted Users</span>
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 24px; font-weight: 800;">30+</span>
+            <span style="font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Premium Themes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side: Clean Authentication Form -->
+    <div class="login-form-side">
+      <div class="form-container-inner">
+        <!-- Minimal Logo -->
+        <div class="app-logo">
+          <div class="logo-icon">R</div>
+          <span class="logo-text">ResumeBuilder</span>
+        </div>
+
+        <div class="mobile-login-hero-card">
+          <img src="login_hero_illustration_1779243297251.png" alt="Professional resume preview">
+          <div class="mobile-login-hero-overlay">
+            <div>
+              <p>Create professional resumes within minutes.</p>
+              <p>Export ATS-friendly PDFs with clickable profile and project links.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-welcome-block" style="margin-bottom: 32px;">
+          <h2 style="font-size: 32px; font-weight: 800; color: #111827; margin-bottom: 8px; letter-spacing: -1px;">Welcome,</h2>
+          <p class="login-welcome-subtitle" style="color: #6B7280; font-size: 15px;">Experience the most advanced resume builder today.</p>
+          <div class="login-form-value-lines">
+            <p>Create professional resumes within minutes.</p>
+            <p>Export ATS-friendly PDFs with clickable profile and project links.</p>
+          </div>
+        </div>
+
+        <!-- Social Login -->
+        <button id="google-login" class="google-btn" onclick="signInWithGoogle(event)">
+          <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google" style="width: 20px;">
+          Continue with Google
+        </button>
+
+        <div class="divider-wrapper">
+          <div class="divider-line"></div>
+          <span class="divider-text">or </span>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Credentials Form -->
+        <div class="auth-form">
+          <div class="input-group">
+            <label class="input-label" for="email">Email address</label>
+            <input type="email" id="email" placeholder="e.g. alex@example.com" class="input-field">
+          </div>
+
+          <div class="input-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label class="input-label" for="password" style="margin-bottom: 0;">Password</label>
+              <a href="#" onclick="sendPasswordReset(event)" style="font-size: 13px; color: #482E87; font-weight: 600; text-decoration: none;">Forgot password?</a>
+            </div>
+            <input type="password" id="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" class="input-field">
+          </div>
+
+          <button id="email-continue" class="primary-btn" onclick="signInWithEmail(event)">Sign In</button>
+          <div id="auth-message" class="auth-message" role="status" aria-live="polite"></div>
+        </div>
+        
+        <div class="login-footer-block" style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #F3F4F6;">
+          <p style="font-size: 15px; color: #6B7280;">New to ResumePro? <a href="#" onclick="createAccount(event)" style="color: #482E87; font-weight: 700; text-decoration: none;">Create account</a></p>
+          <div style="margin-top: 20px;">
+            <a href="home.html" class="skip-link" onclick="enterApp(event)" style="font-size: 14px; color: #9CA3AF; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+              Skip and continue as guest
+              <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    sessionStorage.removeItem('resume_builder_flow');
+
+    function enterApp(event) {
+      if (event) event.preventDefault();
+      sessionStorage.setItem('resume_builder_entry', 'login');
+      sessionStorage.removeItem('resume_builder_flow');
+      window.location.href = 'home.html';
+    }
+
+    const authMessage = document.getElementById('auth-message');
+
+    function setAuthMessage(message, type = 'info') {
+      authMessage.textContent = message;
+      authMessage.dataset.type = type;
+      authMessage.classList.toggle('show', Boolean(message));
+    }
+
+    function getCredentials() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email) throw new Error('Please enter your email address.');
+      if (!password) throw new Error('Please enter your password.');
+      return { email, password };
+    }
+
+    function ensureSupabaseConfigured() {
+      if (!window.AuthManager?.isConfigured()) {
+        throw new Error('Supabase is not configured yet. Add your Project URL and anon key in supabase_config.js.');
+      }
+    }
+
+    async function signInWithGoogle(event) {
+      event.preventDefault();
+      try {
+        ensureSupabaseConfigured();
+        setAuthMessage('Opening Google sign in...', 'info');
+        await AuthManager.signInWithGoogle();
+      } catch (error) {
+        setAuthMessage(error.message, 'error');
+      }
+    }
+
+    async function signInWithEmail(event) {
+      event.preventDefault();
+      try {
+        ensureSupabaseConfigured();
+        const { email, password } = getCredentials();
+        setAuthMessage('Signing you in...', 'info');
+        await AuthManager.signInWithPassword(email, password);
+        enterApp();
+      } catch (error) {
+        setAuthMessage(error.message, 'error');
+      }
+    }
+
+    async function createAccount(event) {
+      event.preventDefault();
+      try {
+        ensureSupabaseConfigured();
+        const { email, password } = getCredentials();
+        setAuthMessage('Creating your account...', 'info');
+        const { session } = await AuthManager.signUpWithPassword(email, password);
+        if (session) {
+          enterApp();
+        } else {
+          setAuthMessage('Account created. Please check your email to confirm your account.', 'success');
+        }
+      } catch (error) {
+        setAuthMessage(error.message, 'error');
+      }
+    }
+
+    async function sendPasswordReset(event) {
+      event.preventDefault();
+      try {
+        ensureSupabaseConfigured();
+        const email = document.getElementById('email').value.trim();
+        if (!email) throw new Error('Enter your email first, then click forgot password.');
+        await AuthManager.resetPassword(email);
+        setAuthMessage('Password reset link sent to your email.', 'success');
+      } catch (error) {
+        setAuthMessage(error.message, 'error');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const session = await AuthManager.getSession();
+        if (session) enterApp();
+      } catch (error) {
+        setAuthMessage(error.message, 'error');
+      }
+    });
+    
+    // Add simple hover effect for skip link
+    const skipLink = document.querySelector('.skip-link');
+    skipLink.onmouseenter = () => skipLink.style.color = '#482E87';
+    skipLink.onmouseleave = () => skipLink.style.color = '#9CA3AF';
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+    const supabaseUrl = 'https://grfvuspjxqfsoaqvdyrl.supabase.co/rest/v1/'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyZnZ1c3BqeHFmc29hcXZkeXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNDQxNTEsImV4cCI6MjA5NDYyMDE1MX0.6f2pKR1K9xCS_xm5cGkToVtQ6dz6QrLdu90SCqmqm3M'
+
+    const client = supabase.createClient(
+      supabaseUrl,
+      supabaseKey
+    )
+  </script>
+
+
+
+
+
+</body>
+</html>

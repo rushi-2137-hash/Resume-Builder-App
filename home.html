@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder - Dashboard</title>
+  <link rel="stylesheet" href="style.css?v=4.1">
+  <!-- Google Font: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Data Persistence -->
+  <script src="storage_manager.js"></script>
+</head>
+<body class="dashboard-body">
+
+  <div class="canvas">
+    <div class="device-frame">
+      <!-- Scrollable Content Area -->
+      <div class="scrollable-content">
+        <!-- Top Section -->
+        <div class="top-section">
+          <div class="greeting-row">
+            <div class="greeting-container">
+              <h1 class="greeting">Welcome,</h1>
+              <p class="subtitle">Build your professional resume</p>
+            </div>
+            <div class="user-profile-icon" onclick="window.location.href='profile.html'" title="Open profile">
+              <i data-lucide="user-circle"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Card -->
+        <div class="primary-action-card" id="create-new-btn">
+          <div class="plus-circle-inner">
+            <i data-lucide="plus"></i>
+          </div>
+          <span class="card-cta">Create New Resume</span>
+        </div>
+
+        <!-- Resumes Section Header -->
+        <div class="resumes-row">
+          <span class="resumes-title">Your Resumes</span>
+        </div>
+
+        <!-- Saved Resumes List Container -->
+        <div id="resumes-list-container" class="resumes-list" style="padding: 0 22px;">
+          <!-- Dynamic resumes will be injected here -->
+        </div>
+      </div>
+
+      <!-- Bottom Navigation -->
+      <div class="bottom-navigation">
+        <div class="nav-item active" onclick="window.location.href='home.html'">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+          <div class="active-line"></div>
+        </div>
+        <div class="nav-item" onclick="window.location.href='templates.html'">
+          <i data-lucide="file-text"></i>
+          <span>Templates</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const listContainer = document.getElementById('resumes-list-container');
+    const createBtn = document.getElementById('create-new-btn');
+
+    createBtn.onclick = () => {
+      // Clear active ID to start fresh a new resume
+      localStorage.removeItem('active_resume_id');
+      sessionStorage.setItem('resume_builder_flow', 'create');
+      document.body.classList.add('creating-resume');
+      createBtn.classList.add('is-launching');
+      setTimeout(() => {
+        window.location.href = 'resume_info.html?flow=create';
+      }, 180);
+    };
+
+    function renderResumes() {
+      const resumes = StorageManager.getAllResumes();
+      
+      if (!resumes || resumes.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state-msg">You haven\'t created any resumes yet. Click above to start!</div>';
+        return;
+      }
+
+      // Sort by last updated
+      resumes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+      listContainer.innerHTML = resumes.map(resume => `
+        <div class="saved-resume-card">
+          <div class="resume-card-info">
+            <div class="resume-card-name">${resume.full_name || 'Untitled Resume'}</div>
+            <div class="resume-card-date">Updated: ${new Date(resume.updatedAt).toLocaleDateString()}</div>
+          </div>
+          <div class="resume-card-actions">
+            <button class="action-btn edit" onclick="editResume('${resume.id}')" title="Edit">
+              <i data-lucide="edit-3"></i>
+            </button>
+            <button class="action-btn view" onclick="viewResume('${resume.id}')" title="View/Download">
+              <i data-lucide="eye"></i>
+            </button>
+            <button class="action-btn share" onclick="shareResumeLink('${resume.id}')" title="Share Link">
+              <i data-lucide="share-2"></i>
+            </button>
+            <button class="action-btn delete" onclick="deleteResume('${resume.id}')" title="Delete">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      lucide.createIcons();
+    }
+
+    window.editResume = (id) => {
+      sessionStorage.setItem('resume_builder_flow', 'edit');
+      StorageManager.setActiveId(id);
+      window.location.href = 'resume_info.html?flow=edit';
+    };
+
+    window.viewResume = (id) => {
+      sessionStorage.removeItem('resume_builder_flow');
+      StorageManager.setActiveId(id);
+      window.location.href = 'templates.html';
+    };
+
+    window.deleteResume = (id) => {
+      if (confirm('Are you sure you want to delete this resume?')) {
+        StorageManager.deleteResume(id);
+        renderResumes();
+      }
+    };
+
+    window.shareResumeLink = (id) => {
+      // Set active ID so the preview page loads this resume
+      StorageManager.setActiveId(id);
+      // Construct the preview URL (using templates.html or skipping direct to preview if possible)
+      // For now, redirecting to templates is safest, or just construct a direct preview link
+      const previewUrl = window.location.origin + window.location.pathname.replace('home.html', 'resume_preview.html') + `?template=modern-purple&id=${id}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'My Resume',
+          url: previewUrl
+        });
+      } else {
+        navigator.clipboard.writeText(previewUrl);
+        alert('Link copied to clipboard!');
+      }
+    };
+
+    // Initial render
+    renderResumes();
+  </script>
+</body>
+</html>

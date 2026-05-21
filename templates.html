@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder - Templates</title>
+  <link rel="stylesheet" href="style.css?v=4.1">
+  <!-- Google Font: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dashboard-body">
+
+  <div class="canvas">
+    <div class="device-frame">
+      <!-- Fixed Header -->
+      <div class="resume-header">
+        <div class="header-left" onclick="window.location.href='home.html'">
+          <i data-lucide="arrow-left"></i>
+          <span class="header-title">Select Template</span>
+        </div>
+        <div class="header-right">
+          <i data-lucide="gem" class="premium-icon"></i>
+        </div>
+      </div>
+
+      <!-- Scrollable Content -->
+      <div class="scrollable-content" style="padding: 20px;">
+        <p style="font-size: 13px; color: #888; margin-bottom: 20px; text-align: center;">Choose from 30+ professional templates</p>
+        
+        <!-- Category Filters -->
+        <div class="category-filters">
+          <button class="filter-chip active" onclick="setFilter('All', this)">All</button>
+          <button class="filter-chip" onclick="setFilter('ATS', this)">ATS</button>
+          <button class="filter-chip" onclick="setFilter('Modern', this)">Modern</button>
+          <button class="filter-chip" onclick="setFilter('Minimal', this)">Minimal</button>
+          <button class="filter-chip" onclick="setFilter('Creative', this)">Creative</button>
+          <button class="filter-chip" onclick="setFilter('Corporate', this)">Corporate</button>
+          <button class="filter-chip" onclick="setFilter('Student', this)">Student</button>
+        </div>
+        
+        <div class="templates-grid" id="templates-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- Templates will be generated here by JS -->
+        </div>
+
+        <div style="height: 40px;"></div>
+      </div>
+
+      <!-- Sticky Bottom Actions -->
+      <div class="bottom-navigation" style="height: 100px; padding: 15px 24px;">
+        <button id="use-template-btn" class="next-btn" style="width: 100%; border-radius: 16px; height: 56px; font-size: 16px; opacity: 0.5;" disabled>USE THIS TEMPLATE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const templates = [
+      // Modern
+      { id: 'modern-purple', name: 'Milan', category: 'Modern', color: '#482E87' },
+      { id: 'modern-pink', name: 'Paris', category: 'Modern', color: '#FF4081' },
+      { id: 'modern-blue', name: 'Berlin', category: 'Modern', color: '#2196F3' },
+      { id: 'modern-dark', name: 'Tokyo', category: 'Modern', color: '#263238' },
+      { id: 'modern-gradient', name: 'Dubai', category: 'Modern', color: 'linear-gradient(135deg, #482E87, #673AB7)' },
+      
+      // ATS Friendly
+      { id: 'ats-standard', name: 'Standard ATS', category: 'ATS', color: '#333' },
+      { id: 'ats-compact', name: 'Compact ATS', category: 'ATS', color: '#444' },
+      { id: 'ats-clean', name: 'Clean Resume', category: 'ATS', color: '#555' },
+      { id: 'ats-simple', name: 'Simple Line', category: 'ATS', color: '#222' },
+      { id: 'ats-bold', name: 'Bold Header', category: 'ATS', color: '#000' },
+
+      // Minimal
+      { id: 'min-classic', name: 'Classic Min', category: 'Minimal', color: '#9E9E9E' },
+      { id: 'min-elegant', name: 'Elegant', category: 'Minimal', color: '#795548' },
+      { id: 'min-soft', name: 'Soft Grey', category: 'Minimal', color: '#BDBDBD' },
+      { id: 'min-vibe', name: 'Vibe', category: 'Minimal', color: '#607D8B' },
+      { id: 'min-pure', name: 'Pure White', category: 'Minimal', color: '#ECEFF1' },
+
+      // Creative
+      { id: 'creative', name: 'Artisan', category: 'Creative', color: '#E91E63' },
+      { id: 'creative-pop', name: 'Pop Art', category: 'Creative', color: '#FFEB3B' },
+      { id: 'creative-neon', name: 'Neon City', category: 'Creative', color: '#00E5FF' },
+      { id: 'creative-split', name: 'Split View', category: 'Creative', color: '#FF5722' },
+      { id: 'creative-circle', name: 'Circle Pix', category: 'Creative', color: '#8BC34A' },
+
+      // Corporate
+      { id: 'executive', name: 'Executive Pro', category: 'Corporate', color: '#1B2944' },
+      { id: 'corp-banker', name: 'Invest Banker', category: 'Corporate', color: '#01579B' },
+      { id: 'corp-lawyer', name: 'Legal Counsel', category: 'Corporate', color: '#1A237E' },
+      { id: 'corp-manager', name: 'Project Lead', category: 'Corporate', color: '#2E7D32' },
+      { id: 'corp-director', name: 'Director', category: 'Corporate', color: '#37474F' },
+
+      // Student/Fresher
+      { id: 'stu-bright', name: 'Bright Grad', category: 'Student', color: '#FF9800' },
+      { id: 'stu-fresh', name: 'Fresh Entry', category: 'Student', color: '#00BCD4' },
+      { id: 'stu-intern', name: 'Intern Pro', category: 'Student', color: '#4CAF50' },
+      { id: 'stu-academic', name: 'Academic', category: 'Student', color: '#673AB7' },
+      { id: 'stu-entry', name: 'Entry Level', category: 'Student', color: '#795548' }
+    ];
+
+    let selectedTemplateId = null;
+
+    function renderTemplates(filter = 'All') {
+      const grid = document.getElementById('templates-grid');
+      const filtered = filter === 'All' ? templates : templates.filter(t => t.category === filter);
+      
+      grid.innerHTML = filtered.map(t => {
+        const isSidebar = t.id.includes('executive') || t.id.includes('purple') || t.id.includes('blue') || t.id.includes('dark') || t.id.includes('split') || t.id.includes('banker');
+        
+        return `
+          <div class="template-card ${selectedTemplateId === t.id ? 'selected' : ''}" data-id="${t.id}" onclick="selectTemplate('${t.id}')">
+            <div class="template-preview-container">
+               <div class="template-preview-mockup ${isSidebar ? 'mockup-sidebar' : 'mockup-standard'}" style="background: ${t.color.includes('linear') ? t.color : t.color}">
+                  ${isSidebar ? `
+                    <div class="mock-side" style="width: 30%; background: rgba(0,0,0,0.2); height: 100%; float: left; padding: 10px 5px;">
+                      <div class="mock-line" style="width: 80%; height: 4px; background: rgba(255,255,255,0.3); margin-bottom: 5px;"></div>
+                      <div class="mock-line" style="width: 60%; height: 2px; background: rgba(255,255,255,0.1);"></div>
+                    </div>
+                    <div class="mock-main" style="width: 70%; float: left; padding: 10px;">
+                      <div class="mock-line" style="width: 90%; height: 3px; background: rgba(255,255,255,0.2); margin-bottom: 5px;"></div>
+                      <div class="mock-line" style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 3px;"></div>
+                      <div class="mock-line" style="width: 80%; height: 2px; background: rgba(255,255,255,0.1);"></div>
+                    </div>
+                  ` : `
+                    <div style="padding: 15px;">
+                      <div class="mock-line" style="width: 60%; height: 6px; background: rgba(255,255,255,0.3); margin: 0 auto 10px auto;"></div>
+                      <div class="mock-line" style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 5px;"></div>
+                      <div class="mock-line" style="width: 90%; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 5px;"></div>
+                      <div class="mock-line" style="width: 100%; height: 2px; background: rgba(255,255,255,0.1);"></div>
+                    </div>
+                  `}
+               </div>
+               <div class="category-tag">${t.category}</div>
+               <div class="check-badge"><i data-lucide="check"></i></div>
+            </div>
+            <div class="template-name-label">${t.name}</div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function selectTemplate(id) {
+      selectedTemplateId = id;
+      document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.id === id);
+      });
+      const btn = document.getElementById('use-template-btn');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.onclick = () => window.location.href = `resume_preview.html?template=${id}`;
+    }
+
+    // Initialize
+    renderTemplates();
+
+    function setFilter(category, el) {
+      document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+      el.classList.add('active');
+      renderTemplates(category);
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

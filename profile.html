@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Settings | ResumePro</title>
+  <link rel="stylesheet" href="style.css?v=4.1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase_config.js"></script>
+  <script src="auth_manager.js"></script>
+  <script src="storage_manager.js"></script>
+</head>
+<body class="dashboard-body profile-body">
+  <div class="canvas profile-canvas">
+    <div class="device-frame profile-frame">
+      <div class="resume-header profile-mobile-header">
+        <div class="header-left" onclick="window.location.href='home.html'">
+          <i data-lucide="arrow-left"></i>
+          <span class="header-title">Profile</span>
+        </div>
+        <div class="header-right">
+          <i data-lucide="settings-2"></i>
+        </div>
+      </div>
+
+      <div class="profile-shell">
+        <aside class="profile-sidebar">
+          <div class="profile-brand">
+            <div class="profile-brand-mark">R</div>
+            <div>
+              <strong>ResumePro</strong>
+              <span>Account Center</span>
+            </div>
+          </div>
+
+          <button class="profile-side-link active" type="button">
+            <i data-lucide="user-round"></i>
+            <span>Profile</span>
+          </button>
+          <button class="profile-side-link" type="button" onclick="window.location.href='home.html'">
+            <i data-lucide="home"></i>
+            <span>Home</span>
+          </button>
+          <button class="profile-side-link" type="button" onclick="window.location.href='templates.html'">
+            <i data-lucide="file-text"></i>
+            <span>Templates</span>
+          </button>
+        </aside>
+
+        <main class="profile-content">
+          <section class="profile-hero-card">
+            <div class="profile-avatar-wrap">
+              <img id="profile-photo" class="profile-avatar-img" alt="Profile photo">
+              <div id="profile-avatar-fallback" class="profile-avatar-fallback">U</div>
+            </div>
+            <div class="profile-hero-info">
+              <p class="profile-eyebrow">Profile Settings</p>
+              <h1 id="profile-name">Guest User</h1>
+              <p id="profile-email">guest@resumepro.app</p>
+            </div>
+            <button class="profile-edit-btn" type="button" id="open-edit-profile">
+              <i data-lucide="pencil"></i>
+              Edit profile
+            </button>
+          </section>
+
+          <section class="profile-section">
+            <div class="profile-section-heading">
+              <div>
+                <span>Resume Insights</span>
+                <p>Your latest resume activity at a glance.</p>
+              </div>
+            </div>
+            <div class="insights-grid">
+              <div class="insight-card">
+                <div class="insight-icon"><i data-lucide="files"></i></div>
+                <span>Total resumes</span>
+                <strong id="total-resumes">0</strong>
+              </div>
+              <div class="insight-card">
+                <div class="insight-icon green"><i data-lucide="download"></i></div>
+                <span>Downloads</span>
+                <strong id="download-count">0</strong>
+              </div>
+              <div class="insight-card wide">
+                <div class="insight-icon gold"><i data-lucide="clock-3"></i></div>
+                <span>Recently edited</span>
+                <strong id="recent-resume">No resumes yet</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="profile-section">
+            <div class="profile-section-heading">
+              <div>
+                <span>Appearance</span>
+                <p>Choose how the workspace should feel.</p>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-copy">
+                  <div class="setting-icon"><i data-lucide="palette"></i></div>
+                  <div>
+                    <strong>Theme</strong>
+                    <span>Choose a light or dark profile view.</span>
+                  </div>
+                </div>
+                <div class="segmented-control" data-setting="theme">
+                  <button type="button" data-value="light">Light</button>
+                  <button type="button" data-value="dark">Dark</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="profile-section">
+            <div class="profile-section-heading">
+              <div>
+                <span>Resume Preferences</span>
+                <p>Set smart defaults for new resumes.</p>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-copy">
+                  <div class="setting-icon"><i data-lucide="layout-template"></i></div>
+                  <div>
+                    <strong>Default template</strong>
+                    <span>Your preferred starting design.</span>
+                  </div>
+                </div>
+                <select class="profile-select" id="default-template">
+                  <option value="modern-purple">Milan</option>
+                  <option value="ats-standard">Standard ATS</option>
+                  <option value="min-elegant">Elegant</option>
+                  <option value="executive">Executive Pro</option>
+                  <option value="stu-bright">Bright Grad</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy">
+                  <div class="setting-icon"><i data-lucide="save"></i></div>
+                  <div>
+                    <strong>Auto-save</strong>
+                    <span>Keep resume changes saved while editing.</span>
+                  </div>
+                </div>
+                <label class="toggle-switch">
+                  <input id="autosave-toggle" type="checkbox">
+                  <span></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy">
+                  <div class="setting-icon"><i data-lucide="file-type"></i></div>
+                  <div>
+                    <strong>Page size</strong>
+                    <span>Choose the resume document format.</span>
+                  </div>
+                </div>
+                <div class="segmented-control compact" data-setting="pageSize">
+                  <button type="button" data-value="a4">A4</button>
+                  <button type="button" data-value="letter">Letter</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="profile-section two-column-section">
+            <div class="settings-card">
+              <div class="profile-section-heading inside">
+                <div>
+                  <span>Account & Security</span>
+                  <p>Manage access to your account.</p>
+                </div>
+              </div>
+              <button class="setting-action" type="button" data-notice="Password settings will be available after account authentication is connected.">
+                <span><i data-lucide="key-round"></i> Change password</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+              <button class="setting-action danger" type="button" id="logout-btn">
+                <span><i data-lucide="log-out"></i> Logout</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="settings-card">
+              <div class="profile-section-heading inside">
+                <div>
+                  <span>Support</span>
+                  <p>Get help or share your thoughts.</p>
+                </div>
+              </div>
+              <button class="setting-action" type="button" data-notice="Thanks for rating ResumePro. Your support means a lot.">
+                <span><i data-lucide="star"></i> Rate Us</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+              <button class="setting-action" type="button" id="feedback-btn">
+                <span><i data-lucide="message-square"></i> Send Feedback</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+              <button class="setting-action" type="button" data-notice="Help Center content can be connected when your FAQ page is ready.">
+                <span><i data-lucide="circle-help"></i> Help Center / FAQ</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </section>
+
+          <section class="profile-section">
+            <div class="settings-card legal-card">
+              <button class="setting-action" type="button" data-notice="Privacy Policy page can be linked here before launch.">
+                <span><i data-lucide="shield-check"></i> Privacy Policy</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+              <button class="setting-action" type="button" data-notice="Terms & Conditions page can be linked here before launch.">
+                <span><i data-lucide="file-check-2"></i> Terms & Conditions</span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-modal" id="edit-profile-modal" aria-hidden="true">
+    <div class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title">
+      <div class="profile-modal-header">
+        <div>
+          <span id="edit-profile-title">Edit Profile</span>
+          <p>Update your display details.</p>
+        </div>
+        <button class="profile-icon-btn" type="button" id="close-edit-profile" aria-label="Close edit profile">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <label class="profile-photo-uploader">
+        <input id="profile-photo-input" type="file" accept="image/*">
+        <i data-lucide="camera"></i>
+        Upload photo
+      </label>
+      <div class="profile-field">
+        <label for="edit-name">Name</label>
+        <input id="edit-name" type="text" placeholder="Your name">
+      </div>
+      <div class="profile-field">
+        <label for="edit-email">Email</label>
+        <input id="edit-email" type="email" placeholder="you@example.com">
+      </div>
+      <button class="profile-save-btn" type="button" id="save-profile">Save changes</button>
+    </div>
+  </div>
+
+  <div class="profile-toast" id="profile-toast" aria-live="polite"></div>
+
+  <script>
+    const PROFILE_KEY = 'resume_user_profile';
+    const SETTINGS_KEY = 'resume_profile_settings';
+    const DOWNLOAD_KEY = 'resume_download_count';
+
+    const defaultProfile = {
+      name: 'Guest User',
+      email: 'guest@resumepro.app',
+      photo: ''
+    };
+
+    const defaultSettings = {
+      theme: 'light',
+      defaultTemplate: 'modern-purple',
+      autosave: true,
+      pageSize: 'a4'
+    };
+
+    const readJson = (key, fallback) => {
+      try {
+        return { ...fallback, ...(JSON.parse(localStorage.getItem(key)) || {}) };
+      } catch {
+        return fallback;
+      }
+    };
+
+    const saveJson = (key, value) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    };
+
+    let profile = readJson(PROFILE_KEY, defaultProfile);
+    let settings = readJson(SETTINGS_KEY, defaultSettings);
+    if (settings.theme !== 'dark') settings.theme = 'light';
+
+    const resumes = StorageManager.getAllResumes();
+    const recentResume = resumes
+      .slice()
+      .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))[0];
+
+    if (profile.name === defaultProfile.name && recentResume?.full_name) profile.name = recentResume.full_name;
+    if (profile.email === defaultProfile.email && recentResume?.email) profile.email = recentResume.email;
+
+    function applyProfile() {
+      document.getElementById('profile-name').textContent = profile.name || defaultProfile.name;
+      document.getElementById('profile-email').textContent = profile.email || defaultProfile.email;
+      document.getElementById('edit-name').value = profile.name || '';
+      document.getElementById('edit-email').value = profile.email || '';
+
+      const photo = document.getElementById('profile-photo');
+      const fallback = document.getElementById('profile-avatar-fallback');
+      fallback.textContent = (profile.name || 'User').trim().charAt(0).toUpperCase();
+
+      if (profile.photo) {
+        photo.src = profile.photo;
+        photo.style.display = 'block';
+        fallback.style.display = 'none';
+      } else {
+        photo.removeAttribute('src');
+        photo.style.display = 'none';
+        fallback.style.display = 'grid';
+      }
+    }
+
+    function applySettings() {
+      document.body.dataset.profileTheme = settings.theme;
+      document.getElementById('default-template').value = settings.defaultTemplate;
+      document.getElementById('autosave-toggle').checked = Boolean(settings.autosave);
+      document.querySelectorAll('.segmented-control').forEach(control => {
+        const key = control.dataset.setting;
+        control.querySelectorAll('button').forEach(button => {
+          button.classList.toggle('active', button.dataset.value === settings[key]);
+        });
+      });
+    }
+
+    function applyInsights() {
+      document.getElementById('total-resumes').textContent = resumes.length;
+      document.getElementById('download-count').textContent = localStorage.getItem(DOWNLOAD_KEY) || '0';
+      document.getElementById('recent-resume').textContent = recentResume?.full_name || recentResume?.id || 'No resumes yet';
+    }
+
+    document.querySelectorAll('.segmented-control button').forEach(button => {
+      button.addEventListener('click', () => {
+        settings[button.closest('.segmented-control').dataset.setting] = button.dataset.value;
+        saveJson(SETTINGS_KEY, settings);
+        applySettings();
+      });
+    });
+
+    document.getElementById('default-template').addEventListener('change', (event) => {
+      settings.defaultTemplate = event.target.value;
+      saveJson(SETTINGS_KEY, settings);
+    });
+
+    document.getElementById('autosave-toggle').addEventListener('change', (event) => {
+      settings.autosave = event.target.checked;
+      saveJson(SETTINGS_KEY, settings);
+    });
+
+    const toast = document.getElementById('profile-toast');
+    let toastTimer;
+    function showNotice(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    document.querySelectorAll('[data-notice]').forEach(button => {
+      button.addEventListener('click', () => showNotice(button.dataset.notice));
+    });
+
+    document.getElementById('feedback-btn').onclick = () => {
+      window.location.href = 'mailto:support@resumepro.app?subject=ResumePro%20Feedback';
+    };
+
+    const modal = document.getElementById('edit-profile-modal');
+    document.getElementById('open-edit-profile').onclick = () => {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    };
+    document.getElementById('close-edit-profile').onclick = () => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    };
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) document.getElementById('close-edit-profile').click();
+    });
+
+    document.getElementById('profile-photo-input').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        profile.photo = reader.result;
+        saveJson(PROFILE_KEY, profile);
+        applyProfile();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('save-profile').onclick = () => {
+      profile.name = document.getElementById('edit-name').value.trim() || defaultProfile.name;
+      profile.email = document.getElementById('edit-email').value.trim() || defaultProfile.email;
+      saveJson(PROFILE_KEY, profile);
+      applyProfile();
+      document.getElementById('close-edit-profile').click();
+    };
+
+    document.getElementById('logout-btn').onclick = async () => {
+      try {
+        await window.AuthManager?.signOut();
+      } catch (error) {
+        showNotice(error.message);
+        return;
+      }
+      sessionStorage.removeItem('resume_builder_flow');
+      sessionStorage.removeItem('resume_builder_entry');
+      window.location.href = 'index.html';
+    };
+
+    applyProfile();
+    applySettings();
+    applyInsights();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
